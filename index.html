@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="Biochem Master: an offline undergraduate biochemistry study companion.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Biochem Master</title>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">BM</div>
+      <div>
+        <h1>Biochem Master</h1>
+        <p>Offline study companion</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <search class="global-search" aria-label="Search all study material">
+        <label for="globalSearchInput" class="sr-only">Search study material</label>
+        <input
+          id="globalSearchInput"
+          type="search"
+          placeholder="Search questions, topics, glossary..."
+          autocomplete="off"
+          aria-controls="globalSearchResults"
+          aria-expanded="false"
+        >
+        <div id="globalSearchResults" class="global-search-results hidden" role="listbox"></div>
+      </search>
+
+      <button id="installButton" class="button button-secondary hidden" type="button">
+        Install app
+      </button>
+    </div>
+  </header>
+
+  <button id="mobileMenuButton" class="mobile-menu-button" type="button" aria-label="Open navigation" aria-controls="appSidebar" aria-expanded="false">
+    <span aria-hidden="true">☰</span>
+  </button>
+
+  <div id="sidebarOverlay" class="sidebar-overlay" hidden></div>
+
+  <aside id="appSidebar" class="sidebar" aria-label="Main navigation">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Study</span>
+      <button id="sidebarToggleButton" class="sidebar-toggle-button" type="button" aria-label="Collapse sidebar" aria-expanded="true">
+        <span aria-hidden="true">‹</span>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-link active" data-view="dashboard" aria-current="page" type="button">
+        <span class="sidebar-icon" aria-hidden="true">⌂</span>
+        <span class="sidebar-label">Dashboard</span>
+      </button>
+      <button class="sidebar-link" data-view="units" type="button">
+        <span class="sidebar-icon" aria-hidden="true">▦</span>
+        <span class="sidebar-label">Units</span>
+      </button>
+      <button class="sidebar-link" data-view="flashcards" type="button">
+        <span class="sidebar-icon" aria-hidden="true">▤</span>
+        <span class="sidebar-label">Flashcards</span>
+      </button>
+      <button class="sidebar-link" data-view="learn" type="button">
+        <span class="sidebar-icon" aria-hidden="true">✎</span>
+        <span class="sidebar-label">Learn</span>
+      </button>
+      <button class="sidebar-link" data-view="practice" type="button">
+        <span class="sidebar-icon" aria-hidden="true">✓</span>
+        <span class="sidebar-label">Practice Tests</span>
+      </button>
+      <button class="sidebar-link" data-view="bookmarks" type="button">
+        <span class="sidebar-icon" aria-hidden="true">☆</span>
+        <span class="sidebar-label">Bookmarks</span>
+      </button>
+      <button class="sidebar-link" data-view="mistakes" type="button">
+        <span class="sidebar-icon" aria-hidden="true">↻</span>
+        <span class="sidebar-label">Review Mistakes</span>
+      </button>
+      <button class="sidebar-link" data-view="progress" type="button">
+        <span class="sidebar-icon" aria-hidden="true">▥</span>
+        <span class="sidebar-label">Statistics</span>
+      </button>
+      <button class="sidebar-link" data-view="settings" type="button">
+        <span class="sidebar-icon" aria-hidden="true">⚙</span>
+        <span class="sidebar-label">Settings</span>
+      </button>
+    </nav>
+  </aside>
+
+  <div id="appLoadingStatus" class="app-loading-status" role="status" aria-live="polite">
+    Loading study units…
+  </div>
+
+  <main id="main-content" class="app-main" tabindex="-1">
+    <section id="dashboardView" class="view active" aria-labelledby="dashboardTitle">
+      <div class="hero">
+        <div>
+          <p class="eyebrow">Undergraduate biochemistry</p>
+          <h2 id="dashboardTitle">Study one concept at a time.</h2>
+          <p class="hero-copy">
+            Review concise notes, practise active recall, test your understanding,
+            and keep your progress stored privately on this device.
+          </p>
+        </div>
+        <div class="hero-stat">
+          <span id="overallPercent">0%</span>
+          <small>overall mastery</small>
+        </div>
+      </div>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Study library</p>
+            <h3>Choose a unit</h3>
+          </div>
+          <label class="search-field">
+            <span class="sr-only">Search units</span>
+            <input id="unitSearch" type="search" placeholder="Search units or topics">
+          </label>
+        </div>
+        <div id="unitGrid" class="unit-grid" aria-live="polite"></div>
+      </section>
+    </section>
+
+    <section id="learnView" class="view" aria-labelledby="learnTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Adaptive study</p>
+          <h2 id="learnTitle">Learn Mode</h2>
+        </div>
+        <select id="learnUnitSelect" aria-label="Choose study unit"></select>
+      </div>
+
+      <div class="learn-mode-shell">
+        <div class="study-status">
+          <span id="learnCounter">Card 0 of 0</span>
+          <span id="learnDueStatus">0 due</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div id="learnProgressBar" class="progress-fill"></div>
+        </div>
+
+        <article class="learn-card">
+          <p class="eyebrow">Question</p>
+          <h3 id="learnQuestion">Choose a unit to begin.</h3>
+
+          <label class="learn-answer-field">
+            <span>Your answer</span>
+            <textarea id="learnAttemptInput" rows="4" placeholder="Type what you remember before revealing the answer."></textarea>
+          </label>
+
+          <button id="revealLearnAnswerButton" class="button button-primary" type="button">
+            Reveal answer
+          </button>
+
+          <div id="learnAnswerPanel" class="learn-answer-panel hidden">
+            <section>
+              <p class="eyebrow">Answer</p>
+              <p id="learnAnswer"></p>
+            </section>
+
+            <section id="learnExplanationSection">
+              <p class="eyebrow">Explanation</p>
+              <p id="learnExplanation"></p>
+            </section>
+
+            <div class="learn-rating-panel">
+              <p>How well did you know it?</p>
+              <div class="learn-rating-buttons">
+                <button class="button learn-rating-button knew" data-learn-rating="knew" type="button">
+                  I knew it
+                </button>
+                <button class="button learn-rating-button almost" data-learn-rating="almost" type="button">
+                  Almost
+                </button>
+                <button class="button learn-rating-button didnt" data-learn-rating="didnt" type="button">
+                  Didn't know
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="learn-session-summary">
+          <span><strong id="learnKnewCount">0</strong> knew</span>
+          <span><strong id="learnAlmostCount">0</strong> almost</span>
+          <span><strong id="learnDidntCount">0</strong> didn't know</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="flashcardsView" class="view" aria-labelledby="flashcardsTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Active recall</p>
+          <h2 id="flashcardsTitle">Flashcards</h2>
+        </div>
+        <select id="flashcardUnitSelect" aria-label="Choose flashcard unit"></select>
+      </div>
+
+      <div class="flashcard-study-shell">
+        <div class="study-status">
+          <span id="flashcardCounter">Card 0 of 0</span>
+          <span id="flashcardMastery">0 reviewed</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div id="flashcardProgressBar" class="progress-fill"></div>
+        </div>
+
+        <div class="answer-mode-toggle" role="group" aria-label="Answer display mode">
+          <button class="answer-mode-button active" data-answer-mode="flashcard" type="button">
+            Flashcard Mode
+          </button>
+          <button class="answer-mode-button" data-answer-mode="exam" type="button">
+            Exam Mode
+          </button>
+        </div>
+
+        <button id="flashcard" class="flashcard quizlet-card" type="button" aria-label="Flip flashcard">
+          <span class="flashcard-face flashcard-front">
+            <small>Question</small>
+            <strong id="flashcardFront">Choose a unit to begin.</strong>
+            <span class="flip-hint">Tap or click to flip</span>
+          </span>
+
+          <span class="flashcard-face flashcard-back">
+            <div class="flashcard-back-content">
+              <section>
+                <small>Answer</small>
+                <div id="flashcardBack" class="flashcard-answer-content"></div>
+              </section>
+
+              <section id="flashcardExplanationSection" class="flashcard-detail">
+                <small>Explanation</small>
+                <p id="flashcardExplanation"></p>
+              </section>
+
+              <section id="flashcardMemorySection" class="flashcard-detail">
+                <small>Memory Trick</small>
+                <p id="flashcardMemoryTrick"></p>
+              </section>
+
+              <section id="flashcardTrapSection" class="flashcard-detail exam-trap-detail">
+                <small>Exam Trap</small>
+                <p id="flashcardExamTrap"></p>
+              </section>
+            </div>
+          </span>
+        </button>
+
+        <div class="flashcard-action-row">
+          <button id="previousCardButton" class="button button-secondary" type="button">Previous</button>
+          <button id="nextCardButton" class="button button-secondary" type="button">Next</button>
+          <button id="bookmarkCardButton" class="button button-secondary" type="button">☆ Bookmark</button>
+          <button id="shuffleCardsButton" class="button button-secondary" type="button">Shuffle</button>
+          <button id="difficultCardButton" class="button button-warning" type="button">Mark Difficult</button>
+        </div>
+
+        <div class="confidence-panel" aria-labelledby="confidenceTitle">
+          <div>
+            <p class="eyebrow">Confidence</p>
+            <h3 id="confidenceTitle">How well did you know it?</h3>
+          </div>
+          <div class="confidence-buttons">
+            <button class="confidence-button confidence-easy" data-confidence="easy" type="button">Easy</button>
+            <button class="confidence-button confidence-medium" data-confidence="medium" type="button">Medium</button>
+            <button class="confidence-button confidence-hard" data-confidence="hard" type="button">Hard</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quizView" class="view" aria-labelledby="quizTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Multiple Choice</p>
+          <h2 id="quizTitle">MCQ Mode</h2>
+        </div>
+      </div>
+
+      <div id="quizSetupPanel" class="study-panel mcq-setup">
+        <div class="mcq-setting-group">
+          <p class="eyebrow">Question count</p>
+          <div class="segmented-control" role="group" aria-label="Question count">
+            <button class="segment-button active" data-question-count="50" type="button">50</button>
+            <button class="segment-button" data-question-count="75" type="button">75</button>
+            <button class="segment-button" data-question-count="100" type="button">100</button>
+            <button class="segment-button" data-question-count="all" type="button">Entire Unit</button>
+          </div>
+        </div>
+
+        <div class="mcq-setting-group">
+          <p class="eyebrow">Question source</p>
+          <div class="segmented-control" role="group" aria-label="Question source">
+            <button class="segment-button active" data-question-source="unit" type="button">Selected Unit</button>
+            <button class="segment-button" data-question-source="mixed" type="button">Mixed Units</button>
+          </div>
+        </div>
+
+        <label id="quizUnitSelectLabel" class="mcq-select-row">
+          <span>
+            <strong>Unit</strong>
+            <small>Choose the unit used for this test.</small>
+          </span>
+          <select id="quizUnitSelect" aria-label="Choose quiz unit"></select>
+        </label>
+
+        <label class="mcq-checkbox-row">
+          <span>
+            <strong>Randomize order</strong>
+            <small>Shuffle both questions and answer choices.</small>
+          </span>
+          <input id="randomizeQuizToggle" type="checkbox" checked>
+        </label>
+
+        <div id="quizAvailabilityNote" class="quiz-availability-note"></div>
+
+        <button id="startQuizButton" class="button button-primary mcq-start-button" type="button">
+          Start MCQ Test
+        </button>
+      </div>
+
+      <div id="quizPanel" class="study-panel hidden">
+        <div class="study-status">
+          <span id="quizCounter">Question 0 of 0</span>
+          <span id="quizScore">Score: 0 / 0</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div id="quizProgressBar" class="progress-fill"></div>
+        </div>
+
+        <div id="quizUnitBadge" class="quiz-unit-badge"></div>
+        <h3 id="quizQuestion"></h3>
+        <div id="quizOptions" class="quiz-options"></div>
+
+        <div id="quizFeedback" class="quiz-feedback" aria-live="polite"></div>
+
+        <button id="nextQuestionButton" class="button button-primary hidden" type="button">
+          Next question
+        </button>
+      </div>
+
+      <div id="quizResultPanel" class="study-panel compact hidden">
+        <p class="eyebrow">Test complete</p>
+        <h3 id="quizResultTitle">Your score</h3>
+        <p id="quizResultText"></p>
+        <div class="button-row">
+          <button id="retryQuizButton" class="button button-primary" type="button">Try again</button>
+          <button id="reviewQuizMistakesButton" class="button button-secondary" type="button">
+            Review mistakes
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="progressView" class="view" aria-labelledby="progressTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Learning analytics</p>
+          <h2 id="progressTitle">Statistics</h2>
+        </div>
+        <button id="resetProgressButton" class="button button-danger" type="button">
+          Reset statistics
+        </button>
+      </div>
+
+      <div class="statistics-grid">
+        <article class="stat-card">
+          <span id="studyTimeStat">0m</span>
+          <p>Study Time</p>
+        </article>
+        <article class="stat-card">
+          <span id="masteryStat">0%</span>
+          <p>Mastery</p>
+        </article>
+        <article class="stat-card">
+          <span id="cardsLearnedStat">0</span>
+          <p>Cards Learned</p>
+        </article>
+        <article class="stat-card">
+          <span id="questionsAnsweredStat">0</span>
+          <p>Questions Answered</p>
+        </article>
+        <article class="stat-card">
+          <span id="averageScoreStat">0%</span>
+          <p>Average Score</p>
+        </article>
+        <article class="stat-card">
+          <span id="bookmarksStat">0</span>
+          <p>Bookmarks</p>
+        </article>
+        <article class="stat-card">
+          <span id="dailyStreakStat">0 days</span>
+          <p>Daily Streak</p>
+        </article>
+      </div>
+
+      <div class="statistics-section-grid">
+        <section class="statistics-panel">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="eyebrow">Performance</p>
+              <h3>Overall Progress</h3>
+            </div>
+          </div>
+          <div id="overallStatisticsBars" class="statistics-bars"></div>
+        </section>
+
+        <section class="statistics-panel">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="eyebrow">By topic</p>
+              <h3>Strongest Topics</h3>
+            </div>
+          </div>
+          <div id="strongestTopicsList" class="topic-stat-list"></div>
+        </section>
+
+        <section class="statistics-panel">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="eyebrow">Needs review</p>
+              <h3>Weakest Topics</h3>
+            </div>
+          </div>
+          <div id="weakestTopicsList" class="topic-stat-list"></div>
+        </section>
+      </div>
+
+      <section class="statistics-panel unit-statistics-panel">
+        <div class="section-heading compact-heading">
+          <div>
+            <p class="eyebrow">Unit breakdown</p>
+            <h3>Progress by Unit</h3>
+          </div>
+        </div>
+        <div id="progressList" class="progress-list"></div>
+      </section>
+    </section>
+
+    <section id="unitsView" class="view" aria-labelledby="unitsTitle">
+      <div id="unitLibraryPanel">
+        <div class="view-toolbar">
+          <div>
+            <p class="eyebrow">Study library</p>
+            <h2 id="unitsTitle">Study by Unit</h2>
+          </div>
+          <div class="unit-library-actions">
+            <label class="search-field">
+              <span class="sr-only">Search all units</span>
+              <input id="unitLibrarySearch" type="search" placeholder="Search units, lessons, or topics">
+            </label>
+            <button id="rescanUnitsButton" class="button button-secondary" type="button">
+              Rescan /data/
+            </button>
+          </div>
+        </div>
+        <p id="unitDiscoveryStatus" class="unit-discovery-status" aria-live="polite"></p>
+
+        <div class="unit-table-wrap">
+          <table class="unit-table"><caption class="sr-only">Available biochemistry study units and progress</caption>
+            <thead>
+              <tr>
+                <th>Unit</th>
+                <th>Title</th>
+                <th>Progress</th>
+                <th>Cards</th>
+                <th>Questions</th>
+                <th>Lessons</th>
+                <th><span class="sr-only">Open</span></th>
+              </tr>
+            </thead>
+            <tbody id="unitsLibrary"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="unitWorkspace" class="unit-workspace hidden">
+        <div class="unit-workspace-header">
+          <button id="backToUnitsButton" class="button button-secondary" type="button">← All units</button>
+          <div>
+            <p id="unitWorkspaceNumber" class="eyebrow">Unit</p>
+            <h2 id="unitWorkspaceTitle">Unit title</h2>
+          </div>
+          <label class="search-field unit-search-field">
+            <span class="sr-only">Search within this unit</span>
+            <input id="withinUnitSearch" type="search" placeholder="Search within unit">
+          </label>
+        </div>
+
+        <nav class="unit-tabs" aria-label="Unit study sections">
+          <button class="unit-tab active" data-unit-tab="lessons" type="button">Lessons</button>
+          <button class="unit-tab" data-unit-tab="topics" type="button">Topics</button>
+          <button class="unit-tab" data-unit-tab="flashcards" type="button">Flashcards</button>
+          <button class="unit-tab" data-unit-tab="mcqs" type="button">MCQs</button>
+          <button class="unit-tab" data-unit-tab="practice" type="button">Practice Test</button>
+        </nav>
+
+        <div id="unitWorkspaceContent" class="unit-workspace-content"></div>
+      </div>
+    </section>
+
+
+    <section id="practiceView" class="view" aria-labelledby="practiceTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Exam preparation</p>
+          <h2 id="practiceTitle">Practice Test</h2>
+        </div>
+      </div>
+
+      <div id="practiceSetupPanel" class="study-panel practice-setup">
+        <div class="mcq-setting-group">
+          <p class="eyebrow">Question count</p>
+          <div class="segmented-control" role="group" aria-label="Practice test question count">
+            <button class="segment-button active" data-practice-count="10" type="button">10</button>
+            <button class="segment-button" data-practice-count="25" type="button">25</button>
+            <button class="segment-button" data-practice-count="50" type="button">50</button>
+            <button class="segment-button" data-practice-count="75" type="button">75</button>
+            <button class="segment-button" data-practice-count="100" type="button">100</button>
+            <button class="segment-button" data-practice-count="all" type="button">Entire Unit</button>
+          </div>
+        </div>
+
+        <div class="mcq-setting-group">
+          <p class="eyebrow">Question source</p>
+          <div class="segmented-control" role="group" aria-label="Practice test source">
+            <button class="segment-button active" data-practice-source="unit" type="button">Selected Unit</button>
+            <button class="segment-button" data-practice-source="mixed" type="button">Mixed Units</button>
+          </div>
+        </div>
+
+        <label id="practiceUnitSelectLabel" class="mcq-select-row">
+          <span>
+            <strong>Unit</strong>
+            <small>Choose the unit used for this practice test.</small>
+          </span>
+          <select id="practiceUnitSelect" aria-label="Choose practice test unit"></select>
+        </label>
+
+        <label class="mcq-checkbox-row">
+          <span>
+            <strong>Timer</strong>
+            <small>Optional countdown timer for exam-style practice.</small>
+          </span>
+          <input id="practiceTimerToggle" type="checkbox">
+        </label>
+
+        <label id="practiceTimerMinutesRow" class="mcq-select-row hidden">
+          <span>
+            <strong>Time limit</strong>
+            <small>Select the total time for the test.</small>
+          </span>
+          <select id="practiceTimerMinutes" aria-label="Choose practice test time limit">
+            <option value="10">10 minutes</option>
+            <option value="20">20 minutes</option>
+            <option value="30" selected>30 minutes</option>
+            <option value="45">45 minutes</option>
+            <option value="60">60 minutes</option>
+            <option value="90">90 minutes</option>
+          </select>
+        </label>
+
+        <div id="practiceAvailabilityNote" class="quiz-availability-note"></div>
+
+        <button id="startPracticeButton" class="button button-primary mcq-start-button" type="button">
+          Start Practice Test
+        </button>
+      </div>
+
+      <div id="practiceTestPanel" class="study-panel hidden">
+        <div class="study-status">
+          <span id="practiceCounter">Question 0 of 0</span>
+          <span id="practiceTimerDisplay" class="hidden">00:00</span>
+        </div>
+
+        <div class="progress-track" aria-hidden="true">
+          <div id="practiceProgressBar" class="progress-fill"></div>
+        </div>
+
+        <div id="practiceUnitBadge" class="quiz-unit-badge"></div>
+        <h3 id="practiceQuestion"></h3>
+        <div id="practiceOptions" class="quiz-options"></div>
+
+        <div class="practice-navigation">
+          <button id="previousPracticeQuestionButton" class="button button-secondary" type="button">
+            Previous
+          </button>
+          <button id="nextPracticeQuestionButton" class="button button-primary" type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <div id="practiceResultPanel" class="study-panel compact hidden">
+        <p class="eyebrow">Practice test complete</p>
+        <h3 id="practiceResultScore">0%</h3>
+        <p id="practiceResultSummary"></p>
+        <div class="button-row">
+          <button id="reviewPracticeAnswersButton" class="button button-secondary" type="button">
+            Review incorrect answers
+          </button>
+          <button id="restartPracticeButton" class="button button-primary" type="button">
+            New test
+          </button>
+        </div>
+      </div>
+
+      <div id="practiceReviewPanel" class="hidden">
+        <div class="view-toolbar">
+          <div>
+            <p class="eyebrow">Answer review</p>
+            <h3>Incorrect Answers</h3>
+          </div>
+          <button id="backToPracticeResultsButton" class="button button-secondary" type="button">
+            Back to results
+          </button>
+        </div>
+        <div id="practiceReviewList" class="study-item-list"></div>
+      </div>
+    </section>
+
+    <section id="bookmarksView" class="view" aria-labelledby="bookmarksTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Saved study material</p>
+          <h2 id="bookmarksTitle">Bookmarks</h2>
+        </div>
+        <label class="search-field">
+          <span class="sr-only">Search bookmarks</span>
+          <input id="bookmarkSearchInput" type="search" placeholder="Search bookmarks">
+        </label>
+      </div>
+      <div id="bookmarksList" class="study-item-list"></div>
+    </section>
+
+    <section id="mistakesView" class="view" aria-labelledby="mistakesTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">Targeted review</p>
+          <h2 id="mistakesTitle">Review Mistakes</h2>
+        </div>
+        <button id="clearMistakesButton" class="button button-danger" type="button">Clear mistakes</button>
+      </div>
+      <div id="mistakesList" class="study-item-list"></div>
+    </section>
+
+    <section id="settingsView" class="view" aria-labelledby="settingsTitle">
+      <div class="view-toolbar">
+        <div>
+          <p class="eyebrow">App preferences</p>
+          <h2 id="settingsTitle">Settings</h2>
+        </div>
+      </div>
+
+      <div class="settings-grid">
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Appearance</p>
+            <h3>Theme</h3>
+            <p>Choose the display mode used throughout Biochem Master.</p>
+          </div>
+          <div class="settings-button-group" role="group" aria-label="Theme">
+            <button class="button settings-choice-button" data-theme-choice="light" type="button">
+              Light Mode
+            </button>
+            <button class="button settings-choice-button" data-theme-choice="dark" type="button">
+              Dark Mode
+            </button>
+          </div>
+        </section>
+
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Navigation</p>
+            <h3>Sidebar</h3>
+            <p>Keep the sidebar compact on larger screens.</p>
+          </div>
+          <label class="settings-toggle-row">
+            <span>Collapsed sidebar</span>
+            <input id="sidebarPreferenceToggle" type="checkbox">
+          </label>
+        </section>
+
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Study units</p>
+            <h3>Import New Unit JSON</h3>
+            <p>Import a valid Biochem Master unit file and save it on this device.</p>
+          </div>
+          <input id="unitImportInput" class="hidden-file-input" type="file" accept=".json,application/json">
+          <button id="importUnitButton" class="button button-primary" type="button">
+            Import Unit JSON
+          </button>
+          <p id="unitImportStatus" class="settings-status" aria-live="polite"></p>
+        </section>
+
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Backup</p>
+            <h3>Export Progress</h3>
+            <p>Download all local progress, mistakes, statistics, and preferences.</p>
+          </div>
+          <button id="exportProgressButton" class="button button-secondary" type="button">
+            Export Progress
+          </button>
+        </section>
+
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Restore</p>
+            <h3>Import Progress</h3>
+            <p>Restore a previously exported Biochem Master progress file.</p>
+          </div>
+          <input id="progressImportInput" class="hidden-file-input" type="file" accept=".json,application/json">
+          <button id="importProgressButton" class="button button-secondary" type="button">
+            Import Progress
+          </button>
+          <p id="progressImportStatus" class="settings-status" aria-live="polite"></p>
+        </section>
+
+        <section class="settings-card danger-settings-card">
+          <div>
+            <p class="eyebrow">Danger zone</p>
+            <h3>Reset Progress</h3>
+            <p>Erase all learning history, test results, bookmarks, and statistics on this device.</p>
+          </div>
+          <button id="settingsResetProgressButton" class="button button-danger" type="button">
+            Reset Progress
+          </button>
+        </section>
+
+        <section class="settings-card">
+          <div>
+            <p class="eyebrow">Version</p>
+            <h3>App Version</h3>
+          </div>
+          <p id="appVersionText" class="app-version-text">Biochem Master 1.0.0</p>
+        </section>
+
+        <section class="settings-card settings-card-wide">
+          <div>
+            <p class="eyebrow">About</p>
+            <h3>Biochem Master</h3>
+            <p>
+              A lightweight offline study companion for undergraduate biochemistry.
+              Study data and progress remain on this device unless you export them.
+            </p>
+          </div>
+          <ul class="about-list">
+            <li>Built with HTML5, CSS3, vanilla JavaScript, and JSON.</li>
+            <li>No account, backend server, database, or external API is required.</li>
+            <li>Designed for offline studying on desktop and iPad.</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Biochem Master stores study progress locally on this device.</p>
+    <span id="offlineStatus">Offline ready</span>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>

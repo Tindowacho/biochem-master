@@ -1,0 +1,39 @@
+{
+  "name": "Biochem Master",
+  "short_name": "Biochem",
+  "description": "An offline undergraduate biochemistry study companion.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7f8",
+  "theme_color": "#0f766e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "version": "1.2.0",
+  "id": "./",
+  "categories": [
+    "education",
+    "productivity"
+  ],
+  "lang": "en-CA",
+  "dir": "ltr",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "prefer_related_applications": false
+}
