@@ -131,4 +131,15 @@ The application includes semantic landmarks, keyboard navigation, visible focus 
 
 ## Version
 
-Biochem Master 1.2.0
+Biochem Master 1.3.0
+
+
+## Included course database
+
+Version 1.3.0 includes Units 1–5 from `Biochem Unit 1-5a(1).pdf`.
+
+Each unit file preserves all extracted source records in its `items` array and supplies interactive lessons, topics, flashcards, exam answers, explanations, memory tricks, exam traps, and MCQs.
+
+## Adding future PDFs
+
+The browser app does not parse PDFs directly. Future PDFs should be converted into Biochem Master JSON files, then added as `data/unit-6.json`, `data/unit-7.json`, and so forth. Add each filename to `data/index.json` and upload the changed `data` folder to GitHub. No application-code changes are required.

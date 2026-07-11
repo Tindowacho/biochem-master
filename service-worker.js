@@ -5,7 +5,7 @@
 
 "use strict";
 
-const CACHE_VERSION = "v13";
+const CACHE_VERSION = "v14";
 const STATIC_CACHE = `biochem-master-static-${CACHE_VERSION}`;
 const DATA_CACHE = `biochem-master-data-${CACHE_VERSION}`;
 

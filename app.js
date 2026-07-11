@@ -5,7 +5,7 @@
 
 "use strict";
 
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.3.0";
 const IMPORTED_UNITS_KEY = "biochem-master-imported-units-v1";
 const THEME_KEY = "biochem-master-theme";
 
